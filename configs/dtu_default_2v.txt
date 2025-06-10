@@ -1,0 +1,61 @@
+dataset_name = dtu
+datadir = ./data/rs_dtu_4/DTU/scan21
+expname =  scan21_2v
+basedir = ./log
+train_frame_num = [22, 25]
+test_frame_num = [1, 2, 9, 10, 11, 12, 14, 15, 23, 24, 26, 27, 29, 30, 31, 32, 33, 34, 35, 41, 42, 43, 45, 46, 47]
+ndc_ray = 0
+
+n_iters = 5000
+batch_size = 1024
+novel_batch_size = 1024
+
+N_voxel_init = 512 # 128**3
+N_voxel_final = 27000000 # 640**3
+down_sampling_ratio = [4, 16]
+
+upsamp_list = [500,1000,1500,2000,2500,3000]
+update_AlphaMask_list = [1000,2000]
+
+N_vis = 10 # vis all testing images
+vis_every = 2000
+
+render_train = 0
+render_test = 1
+render_path = 0
+
+n_lamb_sigma = [16,16,16]
+n_lamb_sh = [48,48,48]
+
+shadingMode = MLP_Fea2
+fea2denseAct = softplus
+
+view_pe = 0
+fea_pe = 0
+
+MR_color_weight = 1.0
+LR_color_weight = 1.0
+
+## loss weight
+TV_weight_density = 40.0
+TV_weight_app = 0.00001
+TV_weight_color_density = 20.0
+
+Sparse_Depth_weight = 0.5
+Self_Depth_weight = 0.01
+Dist_weight = 0.01
+Depth_Smooth_weight = 50.0
+Dense_Depth_weight = 0.0
+warping_patch_size = 15
+
+Occ_loss_weight = 0.0
+reg_rate = 0.2
+wb_prior = True
+wb_rate = 0.1
+
+L1_weight_inital = 8e-6
+L1_weight_rest = 4e-6
+
+lr_init = 0.04
+lr_basis = 2e-3
+lr_decay_target_ratio = 0.05

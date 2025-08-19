@@ -64,13 +64,12 @@ Calibrating images with the script from [NGP](https://github.com/NVlabs/instant-
 ## Citation
 If you find our code or paper helps, please consider citing:
 ```
-@article{lin2024frugalnerf,
-    title={FrugalNeRF: Fast Convergence for Few-shot Novel View Synthesis without Learned Priors},
-    author={Chin-Yang Lin and Chung-Ho Wu and Chang-Han Yeh and 
-            Shih-Han Yen and Cheng Sun and Yu-Lun Liu},
-    journal={CVPR},
-    year={2025}
-	}
+@inproceedings{lin2024frugalnerf,
+  title={FrugalNeRF: Fast Convergence for Few-shot Novel View Synthesis without Learned Priors},
+  author={Chin-Yang Lin and Chung-Ho Wu and Chang-Han Yeh and Shih-Han Yen and Cheng Sun and Yu-Lun Liu},
+  booktitle={CVPR},
+  year={2025}
+}
 ```
 
 ## Acknowledgements

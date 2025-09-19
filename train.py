@@ -11,6 +11,8 @@ from torch.utils.tensorboard import SummaryWriter
 import datetime
 
 from dataLoader import dataset_dict
+from dataLoader.colmapUtils.run_colmap import run_colmap_cli
+
 import sys
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -555,6 +557,40 @@ if __name__ == '__main__':
 
     args = config_parser()
     print(args)
+
+    # --- BEGIN: AUTO RUN COLMAP CLI (Colab-friendly) ---
+    try:
+        # chỉnh path ảnh: mặc định là args.datadir/images
+        # nếu dataset bạn dùng có cấu trúc khác, sửa image_dir tương ứng
+        image_dir = os.path.join(args.datadir, "images")
+        work_dir = os.path.join(args.datadir, "colmap_out")  # nơi lưu database & sparse
+
+        # Nếu ảnh không ở đó, thử vài biến thể (thường gặp)
+        if not os.path.exists(image_dir):
+            # thử cấu trúc dataset/scene/images
+            alt = os.path.join(args.datadir, os.path.basename(args.datadir), "images")
+            if os.path.exists(alt):
+                image_dir = alt
+
+        # Nếu có images và chưa có sparse result -> chạy colmap
+        sparse0 = os.path.join(work_dir, "sparse", "0")
+        if os.path.exists(image_dir) and not os.path.exists(sparse0):
+            print(f"[train.py] Found images at {image_dir} and no sparse model. Running COLMAP CLI...")
+            # Nếu dataset cần camera model đặc biệt, đổi camera_model param
+            # ví dụ: camera_model="SIMPLE_RADIAL", camera_params="fx,fy,cx,cy"
+            try:
+                run_colmap_cli(image_dir=image_dir, work_dir=work_dir, camera_model=None, camera_params=None)
+            except Exception as e:
+                print("[train.py] ERROR running COLMAP CLI:", e)
+                print("Make sure 'colmap' is installed (on Colab: !apt-get install -y colmap) and images are valid.")
+                raise
+        else:
+            print("[train.py] Skip COLMAP: either images not found or sparse already exists.")
+    except Exception as ex:
+        print("[train.py] Exception while trying to run COLMAP:", ex)
+        # nếu muốn dừng hoàn toàn khi colmap lỗi, bỏ comment dòng bên dưới:
+        # raise
+    # --- END: AUTO RUN COLMAP CLI ---
 
     if  args.export_mesh:
         export_mesh(args)

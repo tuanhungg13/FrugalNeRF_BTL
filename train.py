@@ -20,6 +20,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 renderer = OctreeRender_trilinear_fast
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
+os.environ["COLMAP_NO_GUI"] = "1"
+os.environ["COLMAP_NO_GPU"] = "1"
 
 class SimpleSampler:
     def __init__(self, total, batch):

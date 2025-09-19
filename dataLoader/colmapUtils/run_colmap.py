@@ -1,6 +1,8 @@
 # dataLoader/colmapUtils/run_colmap.py
 import os
 import subprocess
+os.environ["QT_QPA_PLATFORM"] = "offscreen"
+os.environ["COLMAP_NO_GUI"] = "1"
 
 def run_colmap_cli(image_dir, work_dir, camera_model=None, camera_params=None, verbose=True, skip_if_exists=True):
     """
@@ -18,20 +20,29 @@ def run_colmap_cli(image_dir, work_dir, camera_model=None, camera_params=None, v
     undistort_dir = os.path.join(work_dir, "dense")
 
     # nếu đã có kết quả thì không chạy lại
+    
     if skip_if_exists and os.path.exists(os.path.join(sparse_dir, "0")):
         if verbose:
             print(f"[run_colmap_cli] sparse/0 already exists in {sparse_dir}, skip.")
         return sparse_dir
 
     def run(cmd):
-        if verbose:
-            print("RUN:", " ".join(cmd))
+        # if verbose:
+        #     print("RUN:", " ".join(cmd))
+        print("[DEBUG] Running command:", " ".join(cmd))
+
         subprocess.run(cmd, check=True)
 
     # build commands
-    cmd_feat = ["colmap", "feature_extractor", "--database_path", database_path, "--image_path", image_dir, "--ImageReader.single_camera", "1"]
-    if camera_model:
-        cmd_feat += ["--ImageReader.camera_model", camera_model]
+    cmd_feat = [
+        "colmap", "feature_extractor",
+        "--database_path", database_path,
+        "--image_path", image_dir,
+        "--ImageReader.single_camera", "1",
+        "--SiftExtraction.use_gpu", "1",   # ✅ bật GPU
+        "--ImageReader.camera_model", "PINHOLE"  # ✅ DJI ảnh nên dùng PINHOLE
+    ]
+
     if camera_params:
         if isinstance(camera_params, (list, tuple)):
             for p in camera_params:
@@ -39,7 +50,13 @@ def run_colmap_cli(image_dir, work_dir, camera_model=None, camera_params=None, v
         else:
             cmd_feat += ["--ImageReader.camera_params", str(camera_params)]
 
-    cmd_match = ["colmap", "exhaustive_matcher", "--database_path", database_path]
+    cmd_match = [
+        "colmap", "exhaustive_matcher",
+        "--database_path", database_path,
+        "--SiftMatching.use_gpu", "1"   # ✅ bật GPU
+    ]
+
+
 
     os.makedirs(sparse_dir, exist_ok=True)
     cmd_mapper = ["colmap", "mapper", "--database_path", database_path, "--image_path", image_dir, "--output_path", sparse_dir]
